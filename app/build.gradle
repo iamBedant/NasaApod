@@ -17,10 +17,34 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    androidExtensions {
+        experimental = true
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "app"
+
+    productFlavors {
+        uat {
+            it.buildConfigField 'String', 'BASE_URL', BaseUrlUat
+            it.buildConfigField 'String', 'PASSWORD', passwordUat
+            manifestPlaceholders = [
+                    appName: "Obvious uat"
+            ]
+            dimension "app"
+        }
+        prod {
+            it.buildConfigField 'String', 'BASE_URL', BaseUrlProd
+            it.buildConfigField 'String', 'PASSWORD', passwordProd
+            manifestPlaceholders = [
+                    appName: "Obvious"
+            ]
+            dimension "app"
         }
     }
 }
