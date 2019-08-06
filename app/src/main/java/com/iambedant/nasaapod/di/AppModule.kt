@@ -9,6 +9,8 @@ import com.iambedant.nasaapod.data.network.ApiService
 import com.iambedant.nasaapod.data.network.INetworkManager
 import com.iambedant.nasaapod.data.network.NetworkManager
 import com.iambedant.nasaapod.data.persistence.AppDatabase
+import com.iambedant.nasaapod.data.persistence.IPersistenceManager
+import com.iambedant.nasaapod.data.persistence.PersistenceManager
 import com.iambedant.nasaapod.data.persistence.RoomApi
 import com.iambedant.nasaapod.utils.rx.ISchedulerProvider
 import com.iambedant.nasaapod.utils.rx.SchedulerProvider
@@ -72,5 +74,9 @@ class AppModule(private var context: Context) {
     @Singleton
     @Provides
     fun providesDao(database: AppDatabase): RoomApi = database.getDao()
+
+    @Provides
+    @Singleton
+    fun providePersistenceManager(roomApi: RoomApi): IPersistenceManager = PersistenceManager(roomApi)
 
 }

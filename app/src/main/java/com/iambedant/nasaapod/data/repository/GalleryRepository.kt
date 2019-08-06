@@ -27,6 +27,8 @@ class GalleryRepository @Inject constructor(
 
     override fun getImages(listOfDates: List<String>): Flowable<List<ApodUI>> {
         //TODO: Use the date list if we want to implement pagination
+        Timber.d("AAAA GETIMAGE ${Thread.currentThread()}")
+
         return persistenceManager.loadImages()
             .flatMap {
                 val listOfApodUi = mutableListOf<ApodUI>()
@@ -39,6 +41,8 @@ class GalleryRepository @Inject constructor(
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun fetchImageAndStore(date: String) {
+        Timber.d("AAAA FETCHIMAGE ${Thread.currentThread()}")
+
         networkManager.getApod(date)
             .flatMapCompletable { persistenceManager.saveImageToDb(it) }
             .subscribe({ Timber.d("Saved Successfully") }, { Timber.e(it) })

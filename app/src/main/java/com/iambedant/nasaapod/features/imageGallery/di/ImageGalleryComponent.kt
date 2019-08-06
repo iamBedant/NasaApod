@@ -1,7 +1,7 @@
 package com.iambedant.nasaapod.features.imageGallery.di
 
 
-import com.iambedant.nasaapod.GridScreen
+import com.iambedant.nasaapod.features.imageGallery.grid.GridScreen
 import dagger.Subcomponent
 
 /**

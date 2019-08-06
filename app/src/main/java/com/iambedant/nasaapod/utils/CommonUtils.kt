@@ -3,11 +3,25 @@ package com.iambedant.nasaapod.utils
 import com.iambedant.nasaapod.data.model.Apod
 import com.iambedant.nasaapod.data.model.ApodNetworkResponse
 import com.iambedant.nasaapod.data.model.ApodUI
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by @iamBedant on 06,August,2019
  */
 
+
+fun getListOfDates(): List<String> {
+    val listDate = mutableListOf<String>()
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    var fromDate = Date()
+    val calendar = GregorianCalendar()
+    calendar.time = fromDate
+    for (i in 1..20) {
+        listDate.add(sdf.format(calendar.time)).also { calendar.add(Calendar.DATE, -1) }
+    }
+    return listDate
+}
 
 fun convertNetworkResponseToDbModel(it: ApodNetworkResponse) = Apod(
     date = it.date,
