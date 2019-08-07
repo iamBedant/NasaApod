@@ -2,11 +2,13 @@ package com.iambedant.nasaapod.data.repository
 
 import androidx.annotation.VisibleForTesting
 import com.iambedant.nasaapod.data.model.Apod
+import com.iambedant.nasaapod.data.model.ApodNetworkResponse
 import com.iambedant.nasaapod.data.model.ApodUI
 import com.iambedant.nasaapod.data.network.INetworkManager
 import com.iambedant.nasaapod.data.persistence.IPersistenceManager
 import com.iambedant.nasaapod.utils.convertDbModelToUIModel
 import io.reactivex.Flowable
+import io.reactivex.Single
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,5 +59,4 @@ class GalleryRepository @Inject constructor(
         return persistenceManager.loadImages()
 
     }
-
 }
