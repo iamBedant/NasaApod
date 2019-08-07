@@ -1,8 +1,6 @@
 package com.iambedant.nasaapod.di
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import androidx.room.Room
 import com.iambedant.nasaapod.BuildConfig
 import com.iambedant.nasaapod.data.network.ApiService
@@ -78,5 +76,4 @@ class AppModule(private var context: Context) {
     @Provides
     @Singleton
     fun providePersistenceManager(roomApi: RoomApi): IPersistenceManager = PersistenceManager(roomApi)
-
 }

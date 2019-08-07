@@ -12,9 +12,12 @@ import com.iambedant.nasaapod.data.model.ApodUI
 import com.iambedant.nasaapod.data.repository.IGalleryRepository
 import com.iambedant.nasaapod.features.imageGallery.CurrentData
 import com.iambedant.nasaapod.features.imageGallery.detail.DetailScreen
+import com.iambedant.nasaapod.utils.gone
+import com.iambedant.nasaapod.utils.invisible
 import com.iambedant.nasaapod.utils.mobius.DeferredEventSource
 import com.iambedant.nasaapod.utils.mobius.onAccept
 import com.iambedant.nasaapod.utils.rx.ISchedulerProvider
+import com.iambedant.nasaapod.utils.visible
 import com.spotify.mobius.Connectable
 import com.spotify.mobius.Connection
 import com.spotify.mobius.MobiusLoop
@@ -35,6 +38,8 @@ class GridScreen : AppCompatActivity(), IMobiusGalleryView, Connectable<GalleryM
     lateinit var repository: IGalleryRepository
     @Inject
     lateinit var schedulerProvider: ISchedulerProvider
+
+
     private val eventSource = DeferredEventSource<GalleryEvent>()
     private lateinit var mController: MobiusLoop.Controller<GalleryModel, GalleryEvent>
     private lateinit var layoutManager: GridLayoutManager
@@ -76,17 +81,21 @@ class GridScreen : AppCompatActivity(), IMobiusGalleryView, Connectable<GalleryM
     private fun render(it: GalleryModel) {
         with(it) {
             if (isError) {
-                //TODO : Made errorview visible
+                ivError.visible()
+                rv.invisible()
+                progressBar.gone()
             } else {
-
+                ivError.gone()
+                rv.visible()
+                progressBar.visible()
             }
 
             if (loading) {
-                progressBar.visibility = View.VISIBLE
-                rv.visibility = View.INVISIBLE
+                progressBar.visible()
+                rv.gone()
             } else {
-                rv.visibility = View.VISIBLE
-                progressBar.visibility = View.INVISIBLE
+                rv.visible()
+                progressBar.invisible()
             }
             display(it = listOfImages)
             CurrentData.model = this
