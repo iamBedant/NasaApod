@@ -21,10 +21,6 @@ class PersistenceManager @Inject constructor(private val roomApi: RoomApi) : IPe
         )
     }
 
-    override fun loadImage(date: String): Flowable<Apod> {
-        return roomApi.loadImage(date)
-    }
-
     override fun loadImages(): Flowable<List<Apod>> {
         return roomApi.loadImages()
     }

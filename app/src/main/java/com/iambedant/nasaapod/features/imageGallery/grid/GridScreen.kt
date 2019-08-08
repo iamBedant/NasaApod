@@ -48,12 +48,8 @@ class GridScreen : AppCompatActivity(), IMobiusGalleryView, Connectable<GalleryM
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        (application as NasaApodApp).createonImageGalleryComponent()?.inject(this)
-
-        layoutManager = GridLayoutManager(this, 2)
-
-        rv.layoutManager = layoutManager
-        rv.adapter = adapter
+        (application as NasaApodApp).createImageGalleryComponent()?.inject(this)
+        setupRecyclerView()
         mController = createController(
             createEffectHandler(this, repository, schedulerProvider),
             eventSource,
@@ -63,13 +59,18 @@ class GridScreen : AppCompatActivity(), IMobiusGalleryView, Connectable<GalleryM
         mController.start()
     }
 
+    private fun setupRecyclerView() {
+        layoutManager = GridLayoutManager(this, 2)
+        rv.layoutManager = layoutManager
+        rv.adapter = adapter
+    }
+
     private fun resolveDefaultModel() =
         CurrentData.model?.copy(currentItemPosition = CurrentData.currentPosition) ?: GalleryModel()
 
     private fun imageTapped(apod: ApodUI) {
         eventSource.notifyEvent(ClickEvent(apod))
     }
-
 
     override fun connect(output: Consumer<GalleryEvent>): Connection<GalleryModel> {
         addUiListeners(output)
@@ -82,15 +83,14 @@ class GridScreen : AppCompatActivity(), IMobiusGalleryView, Connectable<GalleryM
     private fun render(it: GalleryModel) {
         with(it) {
             if (isError) {
-               Toast.makeText(this@GridScreen,"Something went wrong",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@GridScreen, "Something went wrong", Toast.LENGTH_SHORT).show()
             }
-            if(isNetworkError){
+            if (isNetworkError) {
                 tvErrorCount.text = "Network error for $failedImage images"
                 networkErrorLayout.visible()
-            }else{
+            } else {
                 networkErrorLayout.gone()
             }
-
             if (loading) {
                 progressBar.visible()
                 rv.gone()
@@ -108,13 +108,6 @@ class GridScreen : AppCompatActivity(), IMobiusGalleryView, Connectable<GalleryM
             networkErrorLayout.gone()
             output.accept(RetryEvent)
         }
-
-//        rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-//            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-//                super.onScrolled(recyclerView, dx, dy)
-//                output.accept(UpdateFirstVisibleItemEvent(layoutManager.findFirstVisibleItemPosition()))
-//            }
-//        })
     }
 
     override fun updateClickedItem(clickedItem: Int) {
@@ -157,11 +150,10 @@ class GridScreen : AppCompatActivity(), IMobiusGalleryView, Connectable<GalleryM
         result.dispatchUpdatesTo(adapter)
     }
 
-
-
     override fun onDestroy() {
         mController.stop()
         mController.disconnect()
+        (application as NasaApodApp).releaseImageGalleryComponent()
         super.onDestroy()
     }
 

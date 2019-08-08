@@ -33,7 +33,7 @@ class NasaApodApp : Application() {
         return DaggerAppComponent.builder().appModule(AppModule(this)).build()
     }
 
-    fun createonImageGalleryComponent(): ImageGalleryComponent? {
+    fun createImageGalleryComponent(): ImageGalleryComponent? {
         imageGalleryComponent = appComponent?.plus(ImageGalleryModule())
         return imageGalleryComponent
     }

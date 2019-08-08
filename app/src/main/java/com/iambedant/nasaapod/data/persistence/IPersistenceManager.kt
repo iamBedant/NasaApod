@@ -10,7 +10,6 @@ import io.reactivex.Flowable
  */
 interface IPersistenceManager {
     fun loadImages() : Flowable<List<Apod>>
-    fun loadImage(date:String) : Flowable<Apod>
     fun saveImageToDb(it: ApodNetworkResponse) : Completable
     fun isAvailable(it: String) : Boolean
 }
