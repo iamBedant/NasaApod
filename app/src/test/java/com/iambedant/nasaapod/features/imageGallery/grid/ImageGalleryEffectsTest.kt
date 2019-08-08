@@ -1,7 +1,12 @@
 package com.iambedant.nasaapod.features.imageGallery.grid
 
 import com.iambedant.nasaapod.data.model.ApodUI
+import com.iambedant.nasaapod.data.model.DbOperationFail
+import com.iambedant.nasaapod.data.model.NetworkOperationFail
+import com.iambedant.nasaapod.data.model.Success
 import com.iambedant.nasaapod.data.repository.IGalleryRepository
+import com.iambedant.nasaapod.data.someDate
+import com.iambedant.nasaapod.data.someOtherDate
 import com.iambedant.nasaapod.utils.getListOfDates
 import com.iambedant.nasaapod.utils.rx.ISchedulerProvider
 import com.iambedant.nasaapod.utils.rx.ImmediateSchedulerProvider
@@ -10,6 +15,7 @@ import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Flowable
 import io.reactivex.ObservableTransformer
+import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import io.reactivex.subjects.PublishSubject
 import org.junit.Before
@@ -83,15 +89,41 @@ object ImageGalleryEffectsTest {
             verifyNoMoreInteractions(repository,view)
         }
 
+
         @Test
-        fun `refreshImagesEffectHandler should call refreshImages on repository and subscribe`(){
-            whenever(repository.refreshImages(getListOfDates())).thenReturn(Flowable.just(Unit))
-            val refreshImagesConsumer = refreshImagesEffectHandler(repository)
-            refreshImagesConsumer(RefreshImagesEffect)
-            verify(repository).refreshImages(getListOfDates())
+        fun `refreshImagesEffectHandler emmits RefreshStatusEven with RESULT_STATUS_FAIL in some error case`() {
+            whenever(repository.refreshImagesV2(getListOfDates())).thenReturn(Single.just(listOf(Success, DbOperationFail(date = someDate), NetworkOperationFail(date = someOtherDate))))
+            val testCase = TestCase(refreshImagesEffectHandler(repository, schedulerProvider))
+            testCase.dispatchEffect(RefreshImagesEffect)
+            testCase.assertEvents(RefreshStatusEvent(ResultStatus(status = RESULT_STATUS.FAIL, noOfFailedRequest = 2)))
+            verify(repository).refreshImagesV2(getListOfDates())
             verifyNoMoreInteractions(repository,view)
-            //TODO: assert subscribe is called
         }
+
+        @Test
+        fun `refreshImagesEffectHandler emmits RefreshStatusEven with RESULT_STATUS_SUCCESS in positive case`() {
+            whenever(repository.refreshImagesV2(getListOfDates())).thenReturn(Single.just(listOf(Success, Success, Success)))
+            val testCase = TestCase(refreshImagesEffectHandler(repository, schedulerProvider))
+            testCase.dispatchEffect(RefreshImagesEffect)
+            testCase.assertEvents(RefreshStatusEvent(ResultStatus(status = RESULT_STATUS.SUCCESS, noOfFailedRequest = 0)))
+            verify(repository).refreshImagesV2(getListOfDates())
+            verifyNoMoreInteractions(repository,view)
+        }
+
+
+
+        @Test
+        fun `refreshImagesEffectHandler emmits ErrorEvent in case of error`() {
+            whenever(repository.refreshImagesV2(getListOfDates())).thenReturn(Single.error(Throwable("Something wrong")))
+            val testCase = TestCase(refreshImagesEffectHandler(repository, schedulerProvider))
+            testCase.dispatchEffect(RefreshImagesEffect)
+            testCase.assertEvents(ErrorEvent)
+            verify(repository).refreshImagesV2(getListOfDates())
+            verifyNoMoreInteractions(repository,view)
+        }
+
+
+
     }
 
 

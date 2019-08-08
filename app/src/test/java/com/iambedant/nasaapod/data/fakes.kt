@@ -8,6 +8,8 @@ import com.iambedant.nasaapod.data.model.ApodUI
  * Created by @iamBedant on 06,August,2019
  */
 
+val someDate  = "21-09-2019"
+val someOtherDate = "22-10-2019"
 
 val apodNetworkResponse = ApodNetworkResponse(
     date = "12-24-19",

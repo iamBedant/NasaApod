@@ -1,18 +1,20 @@
 package com.iambedant.nasaapod.data.repository
 
-import com.iambedant.nasaapod.data.apod
 import com.iambedant.nasaapod.data.apodNetworkResponse
 import com.iambedant.nasaapod.data.listOfApod
-import com.iambedant.nasaapod.data.model.Apod
-import com.iambedant.nasaapod.data.model.ApodUI
+import com.iambedant.nasaapod.data.model.*
 import com.iambedant.nasaapod.data.network.INetworkManager
 import com.iambedant.nasaapod.data.persistence.IPersistenceManager
+import com.iambedant.nasaapod.data.someDate
+import com.iambedant.nasaapod.data.someOtherDate
 import com.iambedant.nasaapod.utils.convertDbModelToUIModel
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.observers.TestObserver
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Before
 import org.junit.Test
@@ -39,48 +41,57 @@ class GalleryRepositoryTest {
 
 
     @Test
-    fun `loadImage should call loadImage on roomApi`() {
-        whenever(persistenceManager.loadImage("Date")).thenReturn(Flowable.just(apod))
-        val testSubscriber = TestSubscriber<Apod>()
-        galleryRepository.loadImage("Date").subscribe(testSubscriber)
-        verify(persistenceManager).loadImage("Date")
-        testSubscriber.assertValue(apod)
+    fun `refreshImagesV2`() {
+        whenever(persistenceManager.isAvailable(someDate)).thenReturn(true)
+        whenever(persistenceManager.isAvailable(someOtherDate)).thenReturn(false)
+        whenever(netWorkManager.getApod(someOtherDate)).thenReturn(Single.just(apodNetworkResponse))
+        whenever(persistenceManager.saveImageToDb(apodNetworkResponse)).thenReturn(Completable.complete())
+        val testObserver = TestObserver<List<NetworkResult>>()
+        galleryRepository.refreshImagesV2(listOf(someDate, someOtherDate)).subscribe(testObserver)
+        testObserver.assertValue(listOf(Success))
+        verify(persistenceManager).isAvailable(someOtherDate)
+        verify(persistenceManager).isAvailable(someDate)
+        verify(netWorkManager).getApod(someOtherDate)
+        verify(persistenceManager).saveImageToDb(apodNetworkResponse)
+        verifyNoMoreInteractions(persistenceManager,netWorkManager)
+    }
+
+
+    @Test
+    fun `callNetworkAndUpdateDb should return Success in case of successful network and db operation`() {
+        whenever(netWorkManager.getApod(someDate)).thenReturn(Single.just(apodNetworkResponse))
+        whenever(persistenceManager.saveImageToDb(apodNetworkResponse)).thenReturn(Completable.complete())
+        val testObserver = TestObserver<NetworkResult>()
+        galleryRepository.callNetworkAndUpdateDb(someDate).subscribe(testObserver)
+        testObserver.assertValue(Success)
+        verify(netWorkManager).getApod(someDate)
+        verify(persistenceManager).saveImageToDb(apodNetworkResponse)
         verifyNoMoreInteractions(persistenceManager, netWorkManager)
     }
 
+
     @Test
-    fun `loadImages should call loadImages on roomApi`() {
-        whenever(persistenceManager.loadImages()).thenReturn(Flowable.just(listOfApod))
-        val testSubscriber = TestSubscriber<List<Apod>>()
-        galleryRepository.loadImages().subscribe(testSubscriber)
-        verify(persistenceManager).loadImages()
-        testSubscriber.assertValue(listOfApod)
+    fun `callNetworkAndUpdateDb should return DbOperationFail in case of db error`() {
+        whenever(netWorkManager.getApod(someDate)).thenReturn(Single.just(apodNetworkResponse))
+        whenever(persistenceManager.saveImageToDb(apodNetworkResponse)).thenReturn(Completable.error(Throwable("Some db error")))
+        val testObserver = TestObserver<NetworkResult>()
+        galleryRepository.callNetworkAndUpdateDb(someDate).subscribe(testObserver)
+        testObserver.assertValue(DbOperationFail(apodNetworkResponse.date))
+        verify(netWorkManager).getApod(someDate)
+        verify(persistenceManager).saveImageToDb(apodNetworkResponse)
         verifyNoMoreInteractions(persistenceManager, netWorkManager)
-    }
 
-    @Test
-    fun `refreshImage should call api and store response if data not available in cache`() {
-        val dateList = listOf("Date1", "Date2")
-        whenever(persistenceManager.isAvailable("Date1")).thenReturn(false)
-        whenever(persistenceManager.isAvailable("Date2")).thenReturn(true)
-        whenever(netWorkManager.getApod("Date1")).thenReturn(Single.just(apodNetworkResponse))
-        val testSubscriber = TestSubscriber<Unit>()
-        galleryRepository.refreshImages(dateList).subscribe(testSubscriber)
-        verify(persistenceManager).isAvailable("Date1")
-        verify(persistenceManager).isAvailable("Date2")
-        verify(netWorkManager).getApod("Date1")
-        verify(persistenceManager).saveImageToDb(apodNetworkResponse)
-        verifyNoMoreInteractions(netWorkManager, persistenceManager)
     }
 
 
     @Test
-    fun `fetchImageAndStore should call api and store the response to Db`() {
-        whenever(netWorkManager.getApod("Date1")).thenReturn(Single.just(apodNetworkResponse))
-        galleryRepository.fetchImageAndStore("Date1")
-        verify(netWorkManager).getApod("Date1")
-        verify(persistenceManager).saveImageToDb(apodNetworkResponse)
-        verifyNoMoreInteractions(netWorkManager, persistenceManager)
+    fun `callNetworkAndUpdateDb should return NetworkOperationFail in case of network error`() {
+        whenever(netWorkManager.getApod(someDate)).thenReturn(Single.error(Throwable("SomeError")))
+        val testObserver = TestObserver<NetworkResult>()
+        galleryRepository.callNetworkAndUpdateDb(someDate).subscribe(testObserver)
+        testObserver.assertValue(NetworkOperationFail(someDate))
+        verify(netWorkManager).getApod(someDate)
+        verifyNoMoreInteractions(persistenceManager, netWorkManager)
     }
 
 
@@ -95,7 +106,7 @@ class GalleryRepositoryTest {
         galleryRepository.getImages(listOf()).subscribe(testSubscriber)
         testSubscriber.assertValue(uiModel)
         verify(persistenceManager).loadImages()
-        verifyNoMoreInteractions(persistenceManager,netWorkManager)
+        verifyNoMoreInteractions(persistenceManager, netWorkManager)
 
     }
 
