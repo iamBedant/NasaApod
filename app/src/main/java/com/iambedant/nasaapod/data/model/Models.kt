@@ -3,6 +3,7 @@ package com.iambedant.nasaapod.data.model
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.iambedant.nasaapod.features.imageGallery.grid.RESULT_STATUS
 import kotlinx.android.parcel.Parcelize
 
 /**
@@ -38,3 +39,11 @@ data class ApodUI (
     val title: String,
     val url: String
 ) : Parcelable
+
+
+
+sealed class NetworkResult
+object Success : NetworkResult()
+data class DbOperationFail(val date: String) : NetworkResult()
+data class NetworkOperationFail(val date: String) : NetworkResult()
+

@@ -3,6 +3,7 @@ package com.iambedant.nasaapod.features.imageGallery.grid
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -81,13 +82,13 @@ class GridScreen : AppCompatActivity(), IMobiusGalleryView, Connectable<GalleryM
     private fun render(it: GalleryModel) {
         with(it) {
             if (isError) {
-                ivError.visible()
-                rv.invisible()
-                progressBar.gone()
-            } else {
-                ivError.gone()
-                rv.visible()
-                progressBar.visible()
+               Toast.makeText(this@GridScreen,"Something went wrong",Toast.LENGTH_SHORT).show()
+            }
+            if(isNetworkError){
+                tvErrorCount.text = "Network error for $failedImage images"
+                networkErrorLayout.visible()
+            }else{
+                networkErrorLayout.gone()
             }
 
             if (loading) {
@@ -103,6 +104,11 @@ class GridScreen : AppCompatActivity(), IMobiusGalleryView, Connectable<GalleryM
     }
 
     private fun addUiListeners(output: Consumer<GalleryEvent>) {
+        btnRetry.setOnClickListener {
+            networkErrorLayout.gone()
+            output.accept(RetryEvent)
+        }
+
 //        rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 //            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 //                super.onScrolled(recyclerView, dx, dy)
@@ -150,6 +156,8 @@ class GridScreen : AppCompatActivity(), IMobiusGalleryView, Connectable<GalleryM
         adapter.setMoments(it)
         result.dispatchUpdatesTo(adapter)
     }
+
+
 
     override fun onDestroy() {
         mController.stop()

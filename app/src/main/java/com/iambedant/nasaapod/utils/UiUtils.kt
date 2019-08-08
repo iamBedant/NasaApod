@@ -14,7 +14,7 @@ import com.iambedant.nasaapod.R
 fun getShimmerDrawable(context: Context): Drawable {
     val drawable = ShimmerDrawable()
     val shimmer = Shimmer.ColorHighlightBuilder().setBaseAlpha(1f)
-        .setBaseColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))
+        .setBaseColor(ContextCompat.getColor(context, R.color.colorPrimary))
         .setHighlightColor(ContextCompat.getColor(context, R.color.shimmer_color))
         .setRepeatDelay(300)
         .setHighlightAlpha(1f)

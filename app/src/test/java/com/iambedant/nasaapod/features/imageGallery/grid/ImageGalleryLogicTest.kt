@@ -21,6 +21,9 @@ class ImageGalleryLogicTest{
     private val initSpec = InitSpec(::init)
     private val updateSpec = UpdateSpec(::update)
 
+    /**
+     * Init Tests
+     */
     @Test
     fun `init without dataLoad remote and local data`(){
         initSpec
@@ -41,6 +44,55 @@ class ImageGalleryLogicTest{
             ))
     }
 
+
+    /**
+     * RefreshStatusEvent Tests
+     */
+
+    @Test
+    fun `RefreshStatus should dispatch model with isNetworkError =true in case of fail`(){
+        updateSpec
+            .given(loadedGalleryModel)
+            .whenEvent(RefreshStatusEvent(ResultStatus(status = RESULT_STATUS.FAIL, noOfFailedRequest = 2)))
+            .then(assertThatNext(
+                hasModel(loadedGalleryModel.copy(isNetworkError = true,
+                    failedImage = 2,
+                    loading = false)),
+                hasNoEffects()
+            ))
+    }
+
+    @Test
+    fun `RefreshStatus should dispatch model with isNetworkError =false in case of success`(){
+        updateSpec
+            .given(loadedGalleryModel)
+            .whenEvent(RefreshStatusEvent(ResultStatus(status = RESULT_STATUS.SUCCESS, noOfFailedRequest = 0)))
+            .then(assertThatNext(
+                hasModel(loadedGalleryModel.copy(isNetworkError = false,
+                    failedImage = 0,
+                    loading = false)),
+                hasNoEffects()
+            ))
+    }
+
+    /**
+     * RetryEvent tests
+     */
+
+    @Test
+    fun `Retry should dispatch appropriate model and effects`(){
+        updateSpec
+            .given(loadedGalleryModel)
+            .whenEvent(RetryEvent)
+            .then(assertThatNext(
+                hasModel(loadedGalleryModel.copy(loading = true, isNetworkError = false, failedImage = 0)),
+                hasEffects(RefreshImagesEffect as GalleryEffect)
+            ))
+    }
+
+    /**
+     * imageClicked tests
+     */
     @Test
     fun `image Clicked Event should dispatch UpdateClicked and NavigateToPagerEffect`(){
         updateSpec
@@ -51,6 +103,10 @@ class ImageGalleryLogicTest{
                 NextMatchers.hasEffects(UpdateClickedItem(0),NavigateToPager)
             ))
     }
+
+    /**
+     * ImageLoaded Tests
+     */
 
     @Test
     fun `imageLoaded event should dispetch no change if images is empty`(){
@@ -87,6 +143,9 @@ class ImageGalleryLogicTest{
             ))
     }
 
+    /**
+     * ErrorEvent Tests
+     */
     @Test
     fun `errorOccured Event should return the model with error set to true`(){
         updateSpec

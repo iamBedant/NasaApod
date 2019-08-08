@@ -34,6 +34,7 @@ class ImageAdapter(
                 .load(apod.url)
                 .placeholder(getShimmerDrawable(holder.image.context))
                 .transition(DrawableTransitionOptions.withCrossFade())
+                .error(R.drawable.ic_error_outline_black_24dp)
                 .into(holder.image)
         }
         holder.itemView.setOnClickListener { v ->

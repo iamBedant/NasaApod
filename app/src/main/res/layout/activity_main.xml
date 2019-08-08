@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
+        android:animateLayoutChanges="true"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
         android:background="@color/colorPrimaryDark"
         android:layout_height="match_parent">
 
@@ -27,6 +28,50 @@
                   app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="4dp"
+            android:visibility="gone"
+            android:background="#0F0F0F"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/networkErrorLayout"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" app:layout_constraintHorizontal_bias="0.0">
+        <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="40dp"
+                app:srcCompat="@drawable/ic_portable_wifi_off_black_24dp"
+                android:layout_height="40dp"
+                android:id="@+id/ivError"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="24dp"
+                app:layout_constraintTop_toTopOf="@+id/networkErrorLayout"
+                app:layout_constraintBottom_toBottomOf="@+id/networkErrorLayout"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvErrorCount"
+                android:textColor="#B85D5D"
+                android:fontFamily="@font/noto_serif"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/ivError"
+                android:layout_marginStart="8dp"
+                tools:text="Network error for 25 images"
+                app:layout_constraintEnd_toStartOf="@+id/btnRetry"
+                android:layout_marginEnd="8dp"/>
+        <androidx.appcompat.widget.AppCompatButton
+                android:text="Retry"
+                android:textColor="@color/colorAccent"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnRetry" android:layout_marginTop="8dp"
+                app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="8dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <androidx.recyclerview.widget.RecyclerView
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -34,28 +79,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:id="@+id/rv"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout"/>
+            app:layout_constraintTop_toBottomOf="@+id/networkErrorLayout"
+            app:layout_constraintHorizontal_bias="0.0" app:layout_constraintVertical_bias="0.0"/>
     <ProgressBar
             android:layout_width="wrap_content"
             android:id="@+id/progressBar"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout"/>
+            android:layout_marginTop="32dp" app:layout_constraintTop_toBottomOf="@+id/networkErrorLayout"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"/>
 
-    <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="wrap_content"
-            app:srcCompat="@drawable/ic_portable_wifi_off_black_24dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp"
-            app:layout_constraintTop_toTopOf="@+id/rv"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="@+id/rv" android:id="@+id/ivError"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

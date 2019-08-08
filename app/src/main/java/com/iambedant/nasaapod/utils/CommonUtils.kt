@@ -39,3 +39,5 @@ fun convertDbModelToUIModel(it: Apod): ApodUI = ApodUI(
     title =  it.title ?: "",
     url =  it.url
 )
+
+
