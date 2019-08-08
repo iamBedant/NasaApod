@@ -1,7 +1,6 @@
 package com.iambedant.nasaapod.data.persistence
 
 
-import com.iambedant.nasaapod.data.apod
 import com.iambedant.nasaapod.data.apodNetworkResponse
 import com.iambedant.nasaapod.data.listOfApod
 import com.iambedant.nasaapod.data.model.Apod
@@ -59,15 +58,6 @@ class PersistenceManagerTest{
         verifyNoMoreInteractions(roomApi)
     }
 
-    @Test
-    fun `loadImage should call loadImage on roomApi`(){
-        whenever(roomApi.loadImage("Date")).thenReturn(Flowable.just(apod))
-        val testSubscriber = TestSubscriber<Apod>()
-        persistencemanager.loadImage("Date").subscribe(testSubscriber)
-        verify(roomApi).loadImage("Date")
-        testSubscriber.assertValue(apod)
-        verifyNoMoreInteractions(roomApi)
-    }
 
     @Test
     fun `loadImages should call loadImages on roomApi`(){

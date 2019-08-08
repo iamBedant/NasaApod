@@ -41,7 +41,7 @@ data class ApodUI (
 ) : Parcelable
 
 
-
+//Todo : May be replace this with Arrow Either
 sealed class NetworkResult
 object Success : NetworkResult()
 data class DbOperationFail(val date: String) : NetworkResult()

@@ -17,7 +17,6 @@ enum class RESULT_STATUS {
 
 data class ResultStatus(val status: RESULT_STATUS, val noOfFailedRequest: Int)
 
-
 data class GalleryModel(
     val listOfImages: List<ApodUI> = emptyList(),
     val currentItemPosition: Int = 0,

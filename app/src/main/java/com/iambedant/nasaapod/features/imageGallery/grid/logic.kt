@@ -29,29 +29,13 @@ fun init(model: GalleryModel): First<GalleryModel, GalleryEffect> =
     }
 
 
-/**
- *
- */
 fun update(model: GalleryModel, event: GalleryEvent): Next<GalleryModel, GalleryEffect> =
     when (event) {
-        is ClickEvent -> imageClicked(
-            model,
-            event
-        )
-        is ImageLoaded -> onImageLoaded(
-            model,
-            event
-        )
-        is ErrorEvent -> errorOccured(
-            model
-        )
-        is RetryEvent -> retry(
-            model
-        )
-        is RefreshStatusEvent -> refresh(
-            model,
-            event
-        )
+        is ClickEvent -> imageClicked(model, event)
+        is ImageLoaded -> onImageLoaded(model, event)
+        is ErrorEvent -> errorOccurred(model)
+        is RetryEvent -> retry(model)
+        is RefreshStatusEvent -> refresh(model, event)
     }
 
 fun refresh(model: GalleryModel, event: RefreshStatusEvent): Next<GalleryModel, GalleryEffect> {
@@ -88,7 +72,7 @@ fun imageClicked(model: GalleryModel, event: ClickEvent): Next<GalleryModel, Gal
 }
 
 
-fun errorOccured(model: GalleryModel): Next<GalleryModel, GalleryEffect> {
+fun errorOccurred(model: GalleryModel): Next<GalleryModel, GalleryEffect> {
     return Next.next(model.copy(isError = true))
 }
 
