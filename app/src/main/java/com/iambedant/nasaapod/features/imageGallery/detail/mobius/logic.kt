@@ -20,7 +20,39 @@ fun update(
         is SaveImageEvent -> saveImage(model, event)
         ImageSavingSuccessEvent -> showSuccess()
         ImageSavingFailedEvent -> showFail()
+        is SaveButtonClickedEvent -> saveButtonClicked(model, event)
+        PermissionGranted -> permissionGranted(model)
+        PermissionDenied -> permissonDenied(model)
+        PermissionDeniedForever -> permissionDeniedForever(model)
     }
+
+fun permissonDenied(model: DownloadImageModel): Next<DownloadImageModel, DownloadImageEffect> {
+    return Next.next(model.copy(permissionState = PermissionState.PERMISSION_DENIED))
+}
+
+fun permissionGranted(model: DownloadImageModel): Next<DownloadImageModel, DownloadImageEffect> {
+    return Next.next(
+        model.copy(permissionState = PermissionState.PERMISSION_GRANTED),
+        Effects.effects(
+            SaveImageEffect(model.imageUrl)
+        )
+    )
+}
+
+fun permissionDeniedForever(model: DownloadImageModel): Next<DownloadImageModel, DownloadImageEffect> {
+    return Next.next(model.copy(permissionState = PermissionState.PERMISSION_DENIED_FOREVER))
+}
+
+fun saveButtonClicked(
+    model: DownloadImageModel,
+    event: SaveButtonClickedEvent
+): Next<DownloadImageModel, DownloadImageEffect> {
+    return Next.next(
+        model.copy(
+            imageUrl = event.url
+        ), Effects.effects(CheckPermissionEffect)
+    )
+}
 
 fun showFail(): Next<DownloadImageModel, DownloadImageEffect> {
     return Next.dispatch(Effects.effects(ShowResultMessage("Saving failed")))

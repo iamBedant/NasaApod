@@ -99,6 +99,9 @@ dependencies {
     kapt "androidx.room:room-compiler:$rootProject.room"
     implementation "androidx.room:room-rxjava2:$rootProject.room"
 
+
+    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
+
     //Test Implementations
     testImplementation "junit:junit:$rootProject.junit"
     testImplementation "junit:junit:$rootProject.ext.junit"

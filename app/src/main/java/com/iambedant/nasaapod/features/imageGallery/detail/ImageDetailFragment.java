@@ -16,6 +16,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.iambedant.nasaapod.R;
 import com.iambedant.nasaapod.data.model.ApodUI;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 /**
  * Created by @iamBedant on 07,August,2019
@@ -23,7 +24,7 @@ import com.iambedant.nasaapod.data.model.ApodUI;
 public class ImageDetailFragment extends Fragment {
 
     private static final String EXTRA_IMAGE = "image_item";
-
+    final RxPermissions rxPermissions = new RxPermissions(this);
     public ImageDetailFragment() {
         // Required empty public constructor
     }
