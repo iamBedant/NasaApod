@@ -35,3 +35,6 @@ sealed class DownloadImageEffect
 data class SaveImageEffect( val url: String) : DownloadImageEffect()
 data class ShowResultMessage(val message: String) : DownloadImageEffect()
 object CheckPermissionEffect : DownloadImageEffect()
+
+
+
